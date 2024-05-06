@@ -1,4 +1,6 @@
 import json
+import datetime
+from datetime import time
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 
@@ -61,7 +63,12 @@ def purchase_places():
     places_required = int(request.form["places"])
     places_available = int(competition["number_of_places"])
     club_points = int(club["points"])
+    now = datetime.datetime.now()
+    competition_date = datetime.datetime.strptime(competition['date'], "%Y-%m-%d %H:%M:%S")
     error = False
+    if competition_date < now :
+        flash("You can't book places to an already passed competition")
+        error = True
     if club_points < places_required :
         flash("You don't have enough points.")
         error = True
@@ -72,13 +79,13 @@ def purchase_places():
         flash("You can't book more than 12 places.")
         error = True
     if not error:
-        competition["number_of_places"] = int(competition["number_of_places"]) - places_required
+        competition["number_of_places"] = places_available - places_required
         club["points"] = club_points - places_required
         flash("Great-booking complete!")
+
     return redirect(url_for('show_summary', club=club["name"]))
 
 # TODO: Add route for points display
-
 
 @app.route("/logout")
 def logout():
