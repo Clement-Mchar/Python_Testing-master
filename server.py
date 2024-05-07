@@ -1,6 +1,5 @@
 import json
 import datetime
-from datetime import time
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 
@@ -14,6 +13,28 @@ def load_competitions():
     with open("competitions.json") as comps:
         list_of_competitions = json.load(comps)["competitions"]
         return list_of_competitions
+
+def save_clubs(data):
+    with open("clubs.json") as c:
+        clubs_data = json.load(c)
+        clubs_list = clubs_data["clubs"]
+        for i, club in enumerate(clubs_list):
+            if club["name"] == data["name"]:
+                clubs_list[i] = data
+    with open("clubs.json", 'w') as c:
+        json.dump(clubs_data, c, ensure_ascii=False, indent=4)
+
+def save_competitions(data):
+    with open("competitions.json") as comps:
+        competitions_data = json.load(comps)
+        competitions_list = competitions_data["competitions"]
+        for i, competition in enumerate(competitions_list):
+            if competition["name"] == data["name"]:
+                competitions_list[i] = data
+                break
+    with open("competitions.json", 'w') as c:
+        json.dump(competitions_data, c, ensure_ascii=False, indent=4)
+
 
 
 app = Flask(__name__)
@@ -54,6 +75,7 @@ def book(competition, club):
     else:
         flash("Something went wrong-please try again")
         return render_template("welcome.html", club=club, competitions=competitions)
+    
 
 
 @app.route("/purchase-places", methods=["POST"])
@@ -67,7 +89,7 @@ def purchase_places():
     competition_date = datetime.datetime.strptime(competition['date'], "%Y-%m-%d %H:%M:%S")
     error = False
     if competition_date < now :
-        flash("You can't book places to an already passed competition")
+        flash("You can't purchase places to an already passed competition.")
         error = True
     if club_points < places_required :
         flash("You don't have enough points.")
@@ -80,7 +102,11 @@ def purchase_places():
         error = True
     if not error:
         competition["number_of_places"] = places_available - places_required
+        competition["number_of_places"] = str(competition["number_of_places"])
         club["points"] = club_points - places_required
+        club["points"] = str(club["points"])
+        save_clubs(club)
+        save_competitions(competition)
         flash("Great-booking complete!")
 
     return redirect(url_for('show_summary', club=club["name"]))
