@@ -65,3 +65,36 @@ def test_purchase_places_errors(
         assert club_points_after == expected_points
         assert club_points_after >= 0
 
+
+@pytest.mark.parametrize(
+    "club_name, competition_name, places, expected_value",
+    [
+        (
+            "Club1",
+            "Comp1",
+            10,
+            "Great-booking complete !",
+        ),
+        (
+            "Club1",
+            "Comp3",
+            10,
+            "already passed competition.",
+        ),
+    ]
+)  
+def test_purchase_places_passed_date(client, club_name, competition_name, places, expected_value):
+    now = datetime.datetime.now()
+    competition = next(comp for comp in server.competitions if comp["name"] == competition_name)
+    competition_date = datetime.datetime.strptime(competition['date'], "%Y-%m-%d %H:%M:%S")
+    response = client.post("/purchase-places", data={"club": club_name, "competition": competition_name, "places": places})
+    assert response.status_code == 302
+    assert response.location == f"/show-summary?club={club_name}"
+
+    response = client.get(response.location, follow_redirects=True)
+    assert response.status_code == 200
+    response_data = html.unescape(response.data.decode("utf-8"))
+    assert expected_value in response_data
+
+    if expected_value == "already passed competition.":
+        assert now > competition_date
