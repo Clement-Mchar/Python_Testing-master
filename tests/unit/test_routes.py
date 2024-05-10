@@ -32,3 +32,25 @@ def test_book(client, mock_load_clubs, mock_load_competitions):
 
     assert response.status_code == 200
     assert b"How many places?" in response.data
+
+def test_purchase_places_valid_request(client, mock_load_clubs, mock_load_competitions):
+    response = client.post("/purchase-places", data={"club": "Club1", "competition": "Comp1", "places": "5"})
+    
+    assert response.status_code == 302
+    assert response.location == "/show-summary?club=Club1"
+    response = client.get(response.location, follow_redirects=True)
+    
+    assert response.status_code == 200
+    assert b"Great-booking complete !" in response.data
+
+def test_purchase_places_invalid_request(client, mock_load_clubs, mock_load_competitions):
+    response = client.post("/purchase-places", data={"club": "Club1", "competition": "Comp1", "places": "55"})
+
+    assert response.status_code == 302
+    assert response.location == "/show-summary?club=Club1"
+    
+    response = client.get(response.location, follow_redirects=True)
+    
+    assert response.status_code == 200
+    assert b"Something went wrong :" in response.data
+
