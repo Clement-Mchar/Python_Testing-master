@@ -54,3 +54,21 @@ def test_purchase_places_invalid_request(client, mock_load_clubs, mock_load_comp
     assert response.status_code == 200
     assert b"Something went wrong :" in response.data
 
+
+def test_logout_route(client):
+    response = client.get("/logout")
+
+    assert response.status_code == 302
+    assert response.location == "/"
+
+def test_points_display(client, mock_load_clubs):
+    response = client.get("/points_display")
+
+    assert response.status_code == 200
+    assert b"Club1" in response.data
+    
+def test_page_not_found(client):
+    response = client.get("/invalid_adress")
+
+    assert response.status_code == 404
+    assert b"404" in response.data
