@@ -5,3 +5,6 @@ lib
 .envrc
 __pycache__
 bugs.png
+coverage
+.coverage
+.coveragerc
