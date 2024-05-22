@@ -83,7 +83,7 @@ def purchase_places():
     try:
         places_required = int(request.form["places"])
     except ValueError:
-        flash('Veuillez entrer un nombre valide de places.')
+        flash('Please enter a valid number of places.')
         return render_template(
             "booking.html", club=club, competition=competition
         )

@@ -2,7 +2,7 @@ import pytest
 import server
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def client():
     server.app.config.update({"TESTING": True})
     with server.app.test_client() as client:
@@ -29,7 +29,7 @@ def mock_load_clubs(mocker):
     ]
 
     mocker.patch("server.load_clubs", return_value=mock_data)
-    server.clubs = server.load_clubs()
+    setattr(server, "clubs", mock_data)
     yield
 
 @pytest.fixture
@@ -53,5 +53,5 @@ def mock_load_competitions(mocker):
     ]
 
     mocker.patch("server.load_competitions", return_value=mock_data)
-    server.competitions = server.load_competitions()
+    setattr(server, "competitions", mock_data)
     yield
