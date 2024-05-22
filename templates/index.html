@@ -18,6 +18,7 @@
         <input type="email" name="email" id=""/>
         <button type="submit">Enter</button>
     </form>
+    <p>Want to check clubs points ? <a href="{{ url_for('points_display', clubs=clubs) }}">Click here</a> !</p>
     {% endwith %}
 </body>
 </html>
