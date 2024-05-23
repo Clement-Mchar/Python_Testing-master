@@ -1,6 +1,6 @@
 import json
 import datetime
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for, abort
 
 
 def load_clubs():
@@ -12,27 +12,6 @@ def load_competitions():
     with open("competitions.json") as comps:
         list_of_competitions = json.load(comps)["competitions"]
         return list_of_competitions
-
-def save_clubs(data):
-    with open("clubs.json") as c:
-        clubs_data = json.load(c)
-        clubs_list = clubs_data["clubs"]
-        for i, club in enumerate(clubs_list):
-            if club["name"] == data["name"]:
-                clubs_list[i] = data
-    with open("clubs.json", 'w') as c:
-        json.dump(clubs_data, c, ensure_ascii=False, indent=4)
-
-def save_competitions(data):
-    with open("competitions.json") as comps:
-        competitions_data = json.load(comps)
-        competitions_list = competitions_data["competitions"]
-        for i, competition in enumerate(competitions_list):
-            if competition["name"] == data["name"]:
-                competitions_list[i] = data
-                break
-    with open("competitions.json", 'w') as c:
-        json.dump(competitions_data, c, ensure_ascii=False, indent=4)
 
 app = Flask(__name__)
 app.secret_key = "something_special"
@@ -59,7 +38,7 @@ def show_summary():
             club_name = request.args.get("club")
             club = [c for c in clubs if c["name"] == club_name][0]
         except IndexError:
-            return render_template("page_not_found.html")
+            abort(404)
         return render_template("welcome.html", club=club, competitions=competitions)
 
 
@@ -69,7 +48,7 @@ def book(competition, club):
         found_club = [c for c in clubs if c["name"] == club][0]
         found_competition = [c for c in competitions if c["name"] == competition][0]
     except IndexError:
-        return render_template("page_not_found.html")
+        abort(404)
     if found_club and found_competition:
         return render_template(
             "booking.html", club=found_club, competition=found_competition
@@ -113,8 +92,6 @@ def purchase_places():
         competition["number_of_places"] = str(competition["number_of_places"])
         club["points"] = club_points - places_required
         club["points"] = str(club["points"])
-        save_clubs(club)
-        save_competitions(competition)
         flash("Great-booking complete !")
         flash(f"You have booked {places_required} places to the {competition["name"]} competition !")
     else :
