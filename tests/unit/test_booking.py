@@ -130,3 +130,4 @@ def test_invalid_places_input(client, mock_load_clubs, mock_load_competitions):
 
     flash_messages = flask.get_flashed_messages(with_categories=False)
     assert "Please enter a valid number of places." in flash_messages
+
