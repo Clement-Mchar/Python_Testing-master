@@ -72,3 +72,4 @@ def test_page_not_found(client):
 
     assert response.status_code == 404
     assert b"404" in response.data
+    assert response.location == "/"
