@@ -32,3 +32,4 @@ def test_book(client, mock_load_clubs, mock_load_competitions):
 
     assert response.status_code == 200
     assert b"How many places?" in response.data
+    assert response.location == "/"
