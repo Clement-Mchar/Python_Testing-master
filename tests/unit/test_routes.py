@@ -15,3 +15,21 @@ def test_show_summary_post_invalid_request(client, mock_load_clubs):
     response = client.post("/show-summary", data={"email": "invalid@example.com"})
     assert response.status_code == 302
     assert response.location == "/"
+    
+    response = client.get(response.location, follow_redirects=True)
+    
+    assert response.status_code == 200
+    assert b"This email is invalid, try again." in response.data
+
+def test_show_summary_get(client, mock_load_clubs):
+    response = client.get("/show-summary?club=Club2")
+
+    assert response.status_code == 200
+    assert b"Welcome" in response.data
+
+def test_book(client, mock_load_clubs, mock_load_competitions):
+    response = client.get("/book/Comp1/Club1")
+
+    assert response.status_code == 200
+    assert b"How many places?" in response.data
+    assert response.location == "/"
