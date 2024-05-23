@@ -1,0 +1,5 @@
+[tool.locust]
+locustfile = "tests/performance/locustfile.py"
+host = "http://127.0.0.1:5000"
+users = 6
+spawn-rate = 1
