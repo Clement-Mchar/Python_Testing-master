@@ -54,3 +54,4 @@ def test_purchase_places_invalid_request(client, mock_load_clubs, mock_load_comp
     assert response.status_code == 200
     assert b"Something went wrong :" in response.data
 
+
