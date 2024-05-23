@@ -1,0 +1,8 @@
+[run]
+
+omit =
+    tests/*
+    /__pycache__/*
+    /.pytest_cache/*
+    /Lib/*
+    /Scripts/*
